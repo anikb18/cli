@@ -5,10 +5,10 @@ import * as jose from "https://deno.land/x/jose@v4.13.1/index.ts";
 
 const SB_SPECIFIC_ERROR_CODE = {
   BootError:
-    STATUS_CODE.ServiceUnavailable, /** Service Unavailable (RFC 7231, 6.6.4) */
+    STATUS_CODE.ServiceUnavailable /** Service Unavailable (RFC 7231, 6.6.4) */,
   InvalidWorkerResponse:
-    STATUS_CODE.InternalServerError, /** Internal Server Error (RFC 7231, 6.6.1) */
-  WorkerLimit: 546, /** Extended */
+    STATUS_CODE.InternalServerError /** Internal Server Error (RFC 7231, 6.6.1) */,
+  WorkerLimit: 546 /** Extended */,
 };
 
 const SB_SPECIFIC_ERROR_TEXT = {
@@ -42,11 +42,11 @@ const WALLCLOCK_LIMIT_SEC = parseInt(
 
 const DENO_SB_ERROR_MAP = new Map([
   [Deno.errors.InvalidWorkerCreation, SB_SPECIFIC_ERROR_CODE.BootError],
-  [Deno.errors.InvalidWorkerResponse, SB_SPECIFIC_ERROR_CODE.InvalidWorkerResponse],
   [
-    Deno.errors.WorkerRequestCancelled,
-    SB_SPECIFIC_ERROR_CODE.WorkerLimit,
+    Deno.errors.InvalidWorkerResponse,
+    SB_SPECIFIC_ERROR_CODE.InvalidWorkerResponse,
   ],
+  [Deno.errors.WorkerRequestCancelled, SB_SPECIFIC_ERROR_CODE.WorkerLimit],
 ]);
 
 interface FunctionConfig {
@@ -126,7 +126,7 @@ Deno.serve({
     }
 
     // handle metrics
-    if (pathname === '/_internal/metric') {
+    if (pathname === "/_internal/metric") {
       const metric = await EdgeRuntime.getRuntimeMetrics();
       return Response.json(metric);
     }
@@ -152,18 +152,22 @@ Deno.serve({
       }
     }
 
-    const servicePath = posix.dirname(functionsConfig[functionName].entrypointPath);
+    const servicePath = posix.dirname(
+      functionsConfig[functionName].entrypointPath,
+    );
     console.error(`serving the request with ${servicePath}`);
 
     // Ref: https://supabase.com/docs/guides/functions/limits
     const memoryLimitMb = 256;
-    const workerTimeoutMs = isFinite(WALLCLOCK_LIMIT_SEC) ? WALLCLOCK_LIMIT_SEC * 1000 : 400 * 1000;
+    const workerTimeoutMs = isFinite(WALLCLOCK_LIMIT_SEC)
+      ? WALLCLOCK_LIMIT_SEC * 1000
+      : 400 * 1000;
     const noModuleCache = false;
     const envVarsObj = Deno.env.toObject();
-    const envVars = Object.entries(envVarsObj)
-      .filter(([name, _]) =>
-        !EXCLUDED_ENVS.includes(name) && !name.startsWith("SUPABASE_INTERNAL_")
-      );
+    const envVars = Object.entries(envVarsObj).filter(
+      ([name, _]) =>
+        !EXCLUDED_ENVS.includes(name) && !name.startsWith("SUPABASE_INTERNAL_"),
+    );
 
     const forceCreate = false;
     const customModuleRoot = ""; // empty string to allow any local path
@@ -175,7 +179,10 @@ Deno.serve({
     // point, as their migration process will not be easy.
     const decoratorType = "tc39";
 
-    const absEntrypoint = posix.join(Deno.cwd(), functionsConfig[functionName].entrypointPath);
+    const absEntrypoint = posix.join(
+      Deno.cwd(),
+      functionsConfig[functionName].entrypointPath,
+    );
     const maybeEntrypoint = posix.toFileUrl(absEntrypoint).href;
 
     const staticPatterns = functionsConfig[functionName].staticFiles;
@@ -211,7 +218,7 @@ Deno.serve({
               code: SB_SPECIFIC_ERROR_TEXT[sbCode],
               message: SB_SPECIFIC_ERROR_REASON[sbCode],
             },
-            sbCode
+            sbCode,
           );
         }
       }
@@ -220,7 +227,7 @@ Deno.serve({
         {
           code: STATUS_TEXT[STATUS_CODE.InternalServerError],
           message: "Request failed due to an internal server error",
-          trace: JSON.stringify(e.stack)
+          trace: JSON.stringify(e.stack),
         },
         STATUS_CODE.InternalServerError,
       );
@@ -233,14 +240,14 @@ Deno.serve({
     );
   },
 
-  onError: e => {
+  onError: (e) => {
     return getResponse(
       {
         code: STATUS_TEXT[STATUS_CODE.InternalServerError],
         message: "Request failed due to an internal server error",
-        trace: JSON.stringify(e.stack)
+        trace: JSON.stringify(e.stack),
       },
-      STATUS_CODE.InternalServerError
-    )
-  }
+      STATUS_CODE.InternalServerError,
+    );
+  },
 });

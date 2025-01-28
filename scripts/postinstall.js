@@ -69,7 +69,7 @@ const fetchAndParseCheckSumFile = async (packageJson, agent) => {
     console.error(
       "Could not fetch checksum file",
       response.status,
-      response.statusText
+      response.statusText,
     );
   }
 };
@@ -89,7 +89,7 @@ const errUnsupported = `Installation is not supported for ${process.platform} ${
  */
 async function main() {
   const yarnGlobal = JSON.parse(
-    process.env.npm_config_argv || "{}"
+    process.env.npm_config_argv || "{}",
   ).original?.includes("global");
   if (process.env.npm_config_global || yarnGlobal) {
     throw errGlobal;

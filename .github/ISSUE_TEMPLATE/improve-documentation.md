@@ -1,10 +1,9 @@
 ---
 name: Improve documentation
 about: Suggest an improvement to our documentation
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 **Link**
